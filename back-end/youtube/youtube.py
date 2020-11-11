@@ -5,12 +5,19 @@
 # https://developers.google.com/explorer-help/guides/code_samples#python
 
 import os
+import csv
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
 
 scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
+def write_to_csv():
+    with open('comments.csv', 'w') as comments_file:
+        comments_writer = csv.writer(comments_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        comments_writer.writerow(['Video ID', 'Title', 'Comment'])
+        for row in comments:
+            comments_writer.writerow(list(row))
 
 def main():
     # Disable OAuthlib's HTTPS verification when running locally.
@@ -20,6 +27,7 @@ def main():
     api_service_name = "youtube"
     api_version = "v3"
     client_secrets_file = "client_secret.json"
+    developer_key = "AIzaSyAhpuqx2EJYsrHOpnae3eMswuWCivIk8jU"
 
     # Get credentials and create an API client
     flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
@@ -27,14 +35,15 @@ def main():
     credentials = flow.run_console()
     youtube = googleapiclient.discovery.build(
         api_service_name, api_version, credentials=credentials)
-
-    request = youtube.channels().list(
-        part="snippet",
-        forUsername="Pewdiepie"
+    #youtube comment list
+    request = youtube.commentThreads().list(
+        part="snippet,replies",
+        allThreadsRelatedToChannelId="UC_x5XG1OV2P6uZZ5FSM9Ttw"
     )
     response = request.execute()
 
-    print(response)
+    
 
+    print(response)
 if __name__ == "__main__":
     main()
